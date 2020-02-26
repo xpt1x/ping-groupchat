@@ -1,0 +1,21 @@
+@import url('https://fonts.googleapis.com/css?family=Google+Sans:400,500,700');
+
+.top-heading
+{
+    padding-top: 4%;
+    padding-bottom: 3%;
+    font-family: Google Sans;
+}
+
+#chat-input
+{
+    padding-top: 4%; 
+}
+
+#chat-box
+{
+    scroll-behavior: smooth;
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 1rem
+}

@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block title %} ChatPage {%endblock%}
+{%block tt%} Chat Page {%endblock%}
+{%block body%}
+
+<div class="card">
+    <div class="card-header text-center">
+        <strong>{{name}}</strong>
+    </div>
+    <div id="chat-box-card" class="card-body">
+        <ul id="chat-box" class="list-group list-group-flush">
+        {% if msgs %} 
+        {% for message in msgs %}
+            <li class="list-group-item"><strong>{{message.user_name}}</strong>: {{message.msg}}</li>
+        {% endfor %}
+        {% endif %}
+        </ul>
+    </div>
+    <div class="card-footer text-muted">
+        <button id="leave-btn" class="btn btn-outline-dark">Leave Channel</button>
+    </div>
+</div>
+<div id="chat-input" class="input-group mb-3">
+    <div class="input-group-prepend">
+        <span class="input-group-text">{{session.user_name}}</span>
+      </div>
+    <input id="input-text" type="text" class="form-control" placeholder="Type a message to send"aria-describedby="send-btn">
+    <div class="input-group-append">
+      <button class="btn btn-info" type="button" id="send-btn">Send</button>
+    </div>
+</div>
+{%endblock%}
