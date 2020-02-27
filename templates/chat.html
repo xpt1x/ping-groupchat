@@ -9,7 +9,7 @@
 
 <div class="card">
     <div class="card-header text-center">
-        <strong>{{name}}</strong>
+        <strong>{{channel.channelName}}</strong> | Owner: {{channel.creator}}
     </div>
     <div id="chat-box-card" class="card-body">
         <ul id="chat-box" class="list-group list-group-flush">
@@ -22,6 +22,9 @@
     </div>
     <div class="card-footer text-muted">
         <button id="leave-btn" class="btn btn-outline-dark">Leave Channel</button>
+        {% if session.user_name == channel.creator %}
+        <button id="destroy-btn" class="btn btn-outline-danger" style="float: right;">Destroy</button>
+        {%endif%}
     </div>
 </div>
 <div id="chat-input" class="input-group mb-3">

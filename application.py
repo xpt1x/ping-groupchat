@@ -1,6 +1,6 @@
-import os, requests, socket, datetime
+import os, requests, socket
 
-from flask import Flask, session, render_template, url_for, redirect, g, request, redirect, jsonify
+from flask import Flask, session, render_template, url_for, redirect, g, request, redirect
 from flask_session import Session
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_socketio import SocketIO, emit, join_room, leave_room
@@ -33,6 +33,7 @@ def index():
         if session.get('user_name'):
             # additional check for user details
             if not User.query.get(session.get('user_name')):
+                session.pop('user_name')
                 return render_template('login.html', warnmsg='Please login again')
             # if user has no last channel
             if session.get('last_channel'):
@@ -105,14 +106,14 @@ def channel():
         if Channel.query.get(request.form.get('channel')):
             return render_template('index.html',channels=channels, errmsg='Channel already exists! Join it from list above')
         # channel doesnt exists and form is correct, add channel to db
-        channel = Channel(request.form.get('channel'))
+        channel = Channel(request.form.get('channel'), session.get('user_name'))
         db.session.add(channel)
         db.session.commit()
         # set last channel for this user
         session['last_channel'] = request.form.get('channel')
         # send user to chat page
         channels = Channel.query.all()
-        return render_template('chat.html', name=request.form.get('channel'), channels=channels, sucmsg='Channel created successfully')
+        return render_template('chat.html', channel=channel, channels=channels, sucmsg='Channel created successfully')
     else:
         # user is redirected here
         return redirect(url_for('index'))
@@ -123,11 +124,16 @@ def SetChannel(channel):
     session['last_channel'] = channel
     # fetch info for channel and other channels
     channels = Channel.query.all()
+    # validate the channel first
+    ichannel = Channel.query.get(channel)
+    
+    if not ichannel:
+        return render_template('index.html', channels=channels, errmsg='Channel not found!')
     # fetch old messages ( limit by msg_limit )
     msgs = Message.query.filter_by(channelName=channel).all()
     msgs = msgs[-msg_limit:]
     # clicked any link and brought here
-    return render_template('chat.html', name=channel, channels=channels, msgs=msgs)
+    return render_template('chat.html', channel=ichannel, channels=channels, msgs=msgs)
 
 @socketio.on('user joined')
 def room_joined():
@@ -137,6 +143,21 @@ def room_joined():
         'user_name': session.get('user_name'),
         'channel': session.get('last_channel')
     }, room=room, broadcast=True)
+
+@socketio.on('channel destroy clicked')
+def destroy_channel():
+    room = session.get('last_channel')
+    leave_room(room)
+    # deleting all messages associated with channel
+    all_msgs = Message.__table__.delete().where(Message.channelName == room)
+    db.session.execute(all_msgs)
+    db.session.commit()
+    # delete channel from db
+    db.session.delete(Channel.query.get(room))
+    db.session.commit()
+
+    session.pop('last_channel', None)
+    emit('destroy announce', room=room)
 
 @socketio.on('user left')
 def room_left():

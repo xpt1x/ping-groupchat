@@ -14,16 +14,18 @@ class User(db.Model):
 class Channel(db.Model):
     __tablename__ = 'channels'
     channelName = db.Column(db.String, primary_key=True, nullable=False)
+    creator = db.Column(db.String, nullable=False)
 
-    def __init__(self, channelName):
+    def __init__(self, channelName, creator):
         self.channelName = channelName
+        self.creator = creator
 
 class Message(db.Model):
     __tablename__ = 'messages'
     id = db.Column(db.Integer, primary_key=True, nullable=False)
     user_name = db.Column(db.String, nullable = False)
     msg = db.Column(db.String, nullable = False)
-    channelName = db.Column(db.String, db.ForeignKey('channels.channelName'), nullable=False)
+    channelName = db.Column(db.String, nullable=False)
     time = db.Column(db.String, nullable = False)
 
     def __init__(self, msg, user_name, channelName, time): 

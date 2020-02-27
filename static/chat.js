@@ -25,6 +25,27 @@ document.addEventListener('DOMContentLoaded', () => {
         window.location.replace('/leave')
     }
 
+    if (document.getElementById("destroy-btn")) {
+        document.querySelector('#destroy-btn').onclick = () => {
+            socket.emit('channel destroy clicked')
+            window.location.replace('/leave')
+        }
+    }
+    
+
+    socket.on('recieved message', data => {
+        const li = document.createElement('li')
+        li.classList.add('list-group-item')
+        li.innerHTML = `<${data.time}> | <strong>${data.by}</strong>: ${data.msg}`
+        document.querySelector('#chat-box').append(li)
+        document.querySelector('#input-text').value = ''
+        document.querySelector('#send-btn').disabled = true;
+
+        // scrolling to bottom
+        let container = document.querySelector('#chat-box')
+        container.scrollTop = (container.scrollHeight + container.offsetHeight);
+    })
+
     socket.on('on user join', data => {
         const li = document.createElement('li')
         li.classList.add('list-group-item')
@@ -46,16 +67,8 @@ document.addEventListener('DOMContentLoaded', () => {
         container.scrollTop = (container.scrollHeight + container.offsetHeight);
     })
 
-    socket.on('recieved message', data => {
-        const li = document.createElement('li')
-        li.classList.add('list-group-item')
-        li.innerHTML = `<${data.time}> | <strong>${data.by}</strong>: ${data.msg}`
-        document.querySelector('#chat-box').append(li)
-        document.querySelector('#input-text').value = ''
-        document.querySelector('#send-btn').disabled = true;
-
-        // scrolling to bottom
-        let container = document.querySelector('#chat-box')
-        container.scrollTop = (container.scrollHeight + container.offsetHeight);
+    socket.on('destroy announce', data =>{
+        window.alert('Channel Destroyed')
+        window.location.replace('/leave')
     })
 })
