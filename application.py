@@ -1,4 +1,4 @@
-import os, requests, socket
+import os, requests, socket, datetime
 
 from flask import Flask, session, render_template, url_for, redirect, g, request, redirect, jsonify
 from flask_session import Session
@@ -31,8 +31,9 @@ db.init_app(app)
 def index():
     if request.method == 'GET':
         if session.get('user_name'):
-            # query for user details
-            user = User.query.get(session.get('user_name'))
+            # additional check for user details
+            if not User.query.get(session.get('user_name')):
+                return render_template('login.html', warnmsg='Please login again')
             # if user has no last channel
             if session.get('last_channel'):
                 # send user to the last channel chat page
@@ -110,7 +111,8 @@ def channel():
         # set last channel for this user
         session['last_channel'] = request.form.get('channel')
         # send user to chat page
-        return render_template('chat.html', name=request.form.get('channel'), sucmsg='Channel created successfully')
+        channels = Channel.query.all()
+        return render_template('chat.html', name=request.form.get('channel'), channels=channels, sucmsg='Channel created successfully')
     else:
         # user is redirected here
         return redirect(url_for('index'))
@@ -148,7 +150,7 @@ def room_left():
 @socketio.on('send message')
 def AnnounceMsg(data):
     # add data to DB
-    msg = Message(msg=data['msg'], user_name=session.get('user_name') , channelName=session.get('last_channel'))
+    msg = Message(msg=data['msg'], user_name=session.get('user_name') , channelName=session.get('last_channel'), time=data['time'])
     data['by'] = session.get('user_name')
     db.session.add(msg)
     db.session.commit()

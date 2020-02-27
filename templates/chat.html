@@ -15,7 +15,7 @@
         <ul id="chat-box" class="list-group list-group-flush">
         {% if msgs %} 
         {% for message in msgs %}
-            <li class="list-group-item"><strong>{{message.user_name}}</strong>: {{message.msg}}</li>
+            <li class="list-group-item"><{{message.time}}> | <strong>{{message.user_name}}</strong>: {{message.msg}}</li>
         {% endfor %}
         {% endif %}
         </ul>

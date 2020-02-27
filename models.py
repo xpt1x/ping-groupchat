@@ -24,8 +24,10 @@ class Message(db.Model):
     user_name = db.Column(db.String, nullable = False)
     msg = db.Column(db.String, nullable = False)
     channelName = db.Column(db.String, db.ForeignKey('channels.channelName'), nullable=False)
+    time = db.Column(db.String, nullable = False)
 
-    def __init__(self, msg, user_name, channelName): 
+    def __init__(self, msg, user_name, channelName, time): 
         self.msg = msg
         self.user_name = user_name
         self.channelName = channelName
+        self.time = time

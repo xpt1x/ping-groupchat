@@ -13,7 +13,9 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         document.querySelector('#send-btn').onclick = () => {
-            socket.emit('send message', {'msg': document.querySelector('#input-text').value})     
+            let time = new Date;
+            time = time.toLocaleTimeString();
+            socket.emit('send message', {'msg': document.querySelector('#input-text').value, 'time': time})     
             return false
         }
     })
@@ -47,7 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
     socket.on('recieved message', data => {
         const li = document.createElement('li')
         li.classList.add('list-group-item')
-        li.innerHTML = `<strong>${data.by}</strong>: ${data.msg}`
+        li.innerHTML = `<${data.time}> | <strong>${data.by}</strong>: ${data.msg}`
         document.querySelector('#chat-box').append(li)
         document.querySelector('#input-text').value = ''
         document.querySelector('#send-btn').disabled = true;

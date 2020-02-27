@@ -1,10 +1,12 @@
 @import url('https://fonts.googleapis.com/css?family=Google+Sans:400,500,700');
+body {
+    font-family: Google Sans;
+}
 
 .top-heading
 {
     padding-top: 4%;
     padding-bottom: 3%;
-    font-family: Google Sans;
 }
 
 #chat-input
