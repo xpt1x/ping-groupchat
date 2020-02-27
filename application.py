@@ -8,6 +8,7 @@ from models import *
 
 app = Flask(__name__)
 socketio = SocketIO(app)
+
 # 100 as prescribed in docs
 msg_limit = 100
 
@@ -22,7 +23,6 @@ app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL")
 app.config['SECRET_KEY'] = os.getenv("SECRET_KEY")
 
 # Configure session to use filesystem
-app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db.init_app(app)
@@ -30,13 +30,13 @@ db.init_app(app)
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'GET':
-        if 'user_name' in session:
+        if session.get('user_name'):
             # query for user details
-            user = User.query.get(session['user_name'])
+            user = User.query.get(session.get('user_name'))
             # if user has no last channel
-            if 'last_channel' in session:
+            if session.get('last_channel'):
                 # send user to the last channel chat page
-                return redirect('/channels/' + session['last_channel'])
+                return redirect('/channels/' + session.get('last_channel'))
             else:
                 channels = Channel.query.all()
                 return render_template('index.html', channels=channels)
@@ -60,7 +60,7 @@ def index():
                 session['user_name'] = user.user_name
                 # send to last channel chat page
                 if 'last_channel' in session:
-                    return redirect('/channels/' + session['last_channel'])
+                    return redirect('/channels/' + session.get('last_channel'))
                 else:
                 # no last channel, so display all channels + create page
                     channels = Channel.query.all()
@@ -129,46 +129,51 @@ def SetChannel(channel):
 
 @socketio.on('user joined')
 def room_joined():
-    room = session['last_channel']
+    room = session.get('last_channel')
     join_room(room)
     emit('on user join', {
-        'user_name': session['user_name'],
-        'channel': session['last_channel']
+        'user_name': session.get('user_name'),
+        'channel': session.get('last_channel')
     }, room=room, broadcast=True)
 
 @socketio.on('user left')
 def room_left():
-    room = session['last_channel']
+    room = session.get('last_channel')
     leave_room(room)
     session.pop('last_channel', None)
     emit('left announce', {
-        'user_name': session['user_name'],
+        'user_name': session.get('user_name'),
     }, room=room)
 
 @socketio.on('send message')
 def AnnounceMsg(data):
     # add data to DB
-    msg = Message(msg=data['msg'], user_name=session['user_name'] , channelName=session['last_channel'])
-    data['by'] = session['user_name']
+    msg = Message(msg=data['msg'], user_name=session.get('user_name') , channelName=session.get('last_channel'))
+    data['by'] = session.get('user_name')
     db.session.add(msg)
     db.session.commit()
 
-    room = session['last_channel']
+    room = session.get('last_channel')
     emit('recieved message', data, room=room, broadcast=True)
 
 @app.route('/logout')
 def log_out():
 
-    if 'last_channel' in session:
+    if session.get('last_channel'):
         session.pop('last_channel')
-    session.pop('user_name')
+    if session.get('user_name'):
+        session.pop('user_name')
     return redirect(url_for('index'))
 
 @app.route('/leave')
 def LeaveRoute():
-    if 'last_channel' in session:
+    if session.get('last_channel'):
         session.pop('last_channel', None)
+
     return redirect(url_for('index'))
 
+@app.before_request
+def make_session_permanent():
+    session.permanent = True
 if __name__ == '__main__':
     socketio.run(app)

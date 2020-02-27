@@ -28,6 +28,9 @@ document.addEventListener('DOMContentLoaded', () => {
         li.classList.add('list-group-item')
         li.innerHTML = `<strong>${data.user_name}</strong> has joined the channel`
         document.querySelector('#chat-box').append(li)
+
+        let container = document.querySelector('#chat-box')
+        container.scrollTop = (container.scrollHeight + container.offsetHeight);
     })
 
     socket.on('left announce', data => {
@@ -36,6 +39,9 @@ document.addEventListener('DOMContentLoaded', () => {
         li.classList.add('list-group-item')
         li.innerHTML = `<strong>${data.user_name}</strong> has left the channel`
         document.querySelector('#chat-box').append(li)
+
+        let container = document.querySelector('#chat-box')
+        container.scrollTop = (container.scrollHeight + container.offsetHeight);
     })
 
     socket.on('recieved message', data => {
