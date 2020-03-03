@@ -198,5 +198,6 @@ def LeaveRoute():
 @app.before_request
 def make_session_permanent():
     session.permanent = True
+
 if __name__ == '__main__':
     socketio.run(app)

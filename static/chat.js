@@ -35,7 +35,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     socket.on('recieved message', data => {
         const li = document.createElement('li')
-        li.classList.add('list-group-item')
+        // If send by self
+        if (localStorage.getItem('user_name') == data.by) {
+            li.classList.add('list-group-item')
+            li.classList.add('list-group-item-dark')
+        }
+        else
+            li.classList.add('list-group-item')
+    
         li.innerHTML = `<${data.time}> | <strong>${data.by}</strong>: ${data.msg}`
         document.querySelector('#chat-box').append(li)
         document.querySelector('#input-text').value = ''
@@ -50,8 +57,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const li = document.createElement('li')
         li.classList.add('list-group-item')
         li.innerHTML = `<strong>${data.user_name}</strong> has joined the channel`
+        localStorage.setItem('user_name', data.user_name)
         document.querySelector('#chat-box').append(li)
-
         let container = document.querySelector('#chat-box')
         container.scrollTop = (container.scrollHeight + container.offsetHeight);
     })
@@ -61,6 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const li = document.createElement('li')
         li.classList.add('list-group-item')
         li.innerHTML = `<strong>${data.user_name}</strong> has left the channel`
+        localStorage.clear()
         document.querySelector('#chat-box').append(li)
 
         let container = document.querySelector('#chat-box')
