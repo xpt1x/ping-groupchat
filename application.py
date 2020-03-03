@@ -121,6 +121,8 @@ def channel():
 @app.route('/channels/<channel>')
 def SetChannel(channel):
     # update user's last channel
+    if not session.get('user_name'):
+        return redirect(url_for('index'))
     session['last_channel'] = channel
     # fetch info for channel and other channels
     channels = Channel.query.all()
