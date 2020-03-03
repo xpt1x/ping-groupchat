@@ -11,15 +11,15 @@ document.addEventListener('DOMContentLoaded', () => {
             else
                 document.querySelector('#send-btn').disabled = true;
         };
-
-        document.querySelector('#send-btn').onclick = () => {
-            let time = new Date;
-            time = time.toLocaleTimeString();
-            socket.emit('send message', {'msg': document.querySelector('#input-text').value, 'time': time})  
-            send_clicked = true   
-            return false
-        }
     })
+
+    document.querySelector('#send-btn').onclick = () => {
+        let time = new Date;
+        time = time.toLocaleTimeString();
+        socket.emit('send message', {'msg': document.querySelector('#input-text').value, 'time': time})  
+        send_clicked = true   
+        return false
+    }
 
     document.querySelector('#leave-btn').onclick = () => {
         socket.emit('user left') 
