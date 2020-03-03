@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port)
-
+    var send_clicked = false
     socket.on('connect', () => {
         // let server know user has joined channel
         socket.emit('user joined')
@@ -15,7 +15,8 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelector('#send-btn').onclick = () => {
             let time = new Date;
             time = time.toLocaleTimeString();
-            socket.emit('send message', {'msg': document.querySelector('#input-text').value, 'time': time})     
+            socket.emit('send message', {'msg': document.querySelector('#input-text').value, 'time': time})  
+            send_clicked = true   
             return false
         }
     })
@@ -35,10 +36,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     socket.on('recieved message', data => {
         const li = document.createElement('li')
-        // If send by self
-        if (localStorage.getItem('user_name') == data.by) {
+        // If send_clicked by self
+        if (send_clicked) {
             li.classList.add('list-group-item')
             li.classList.add('list-group-item-dark')
+            send_clicked = false
         }
         else
             li.classList.add('list-group-item')
@@ -57,9 +59,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const li = document.createElement('li')
         li.classList.add('list-group-item')
         li.innerHTML = `<strong>${data.user_name}</strong> has joined the channel`
-        // clear and add username to local
-        localStorage.clear()
-        localStorage.setItem('user_name', data.user_name)
         
         document.querySelector('#chat-box').append(li)
         let container = document.querySelector('#chat-box')
@@ -71,7 +70,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const li = document.createElement('li')
         li.classList.add('list-group-item')
         li.innerHTML = `<strong>${data.user_name}</strong> has left the channel`
-        localStorage.clear()
         document.querySelector('#chat-box').append(li)
 
         let container = document.querySelector('#chat-box')
