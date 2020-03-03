@@ -57,7 +57,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const li = document.createElement('li')
         li.classList.add('list-group-item')
         li.innerHTML = `<strong>${data.user_name}</strong> has joined the channel`
+        // clear and add username to local
+        localStorage.clear()
         localStorage.setItem('user_name', data.user_name)
+        
         document.querySelector('#chat-box').append(li)
         let container = document.querySelector('#chat-box')
         container.scrollTop = (container.scrollHeight + container.offsetHeight);
