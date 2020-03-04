@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port)
+    var socket = io.connect(location.protocol + '//' + location.hostname + ':' + location.port)
 
     socket.on('connect', () => {
         // let server know user has joined channel
