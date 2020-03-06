@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     // namespace
-    var socket = io.connect('https://' + document.domain + ':' + location.port + '/')
+    var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + '/')
     var send_clicked = false
     socket.on('connect', () => {
         // let server know user has joined channel
@@ -8,6 +8,12 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelector('#send-btn').disabled = true;
         
     })
+
+    document.querySelector('#input-text').onkeydown = event => {
+        if (event.key == 13) {
+            document.getElementById("send-button").click();
+        }
+    }
 
     document.querySelector('#input-text').onkeyup = () => {
         if (document.querySelector('#input-text').value.length > 0)
