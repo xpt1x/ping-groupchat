@@ -9,12 +9,6 @@ document.addEventListener('DOMContentLoaded', () => {
         
     })
 
-    document.querySelector('#input-text').onkeydown = event => {
-        if (event.key == 13) {
-            document.getElementById("send-button").click();
-        }
-    }
-
     document.querySelector('#input-text').onkeyup = () => {
         if (document.querySelector('#input-text').value.length > 0)
             document.querySelector('#send-btn').disabled = false;
