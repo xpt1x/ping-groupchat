@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // namespace
     var socket = io.connect('https://' + document.domain + ':' + location.port + '/')
     var send_clicked = false
     socket.on('connect', () => {
