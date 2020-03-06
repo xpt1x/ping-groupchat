@@ -1,17 +1,19 @@
 document.addEventListener('DOMContentLoaded', () => {
-    var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port)
+    var socket = io.connect('https://' + document.domain + ':' + location.port + '/')
     var send_clicked = false
     socket.on('connect', () => {
         // let server know user has joined channel
         socket.emit('user joined')
         document.querySelector('#send-btn').disabled = true;
-        document.querySelector('#input-text').onkeyup = () => {
-            if (document.querySelector('#input-text').value.length > 0)
-                document.querySelector('#send-btn').disabled = false;
-            else
-                document.querySelector('#send-btn').disabled = true;
-        };
+        
     })
+
+    document.querySelector('#input-text').onkeyup = () => {
+        if (document.querySelector('#input-text').value.length > 0)
+            document.querySelector('#send-btn').disabled = false;
+        else
+            document.querySelector('#send-btn').disabled = true;
+    };
 
     document.querySelector('#send-btn').onclick = () => {
         let time = new Date;
