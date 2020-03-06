@@ -8,6 +8,12 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelector('#send-btn').disabled = true;
         
     })
+    // emulating Enter key
+    document.querySelector('#input-text').addEventListener('keydown', event => {
+        if (event.which == 13) {
+            document.querySelector('#send-btn').click()
+        }
+    })
 
     document.querySelector('#input-text').onkeyup = () => {
         if (document.querySelector('#input-text').value.length > 0)
