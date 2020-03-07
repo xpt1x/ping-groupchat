@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% block title %} ChatPage {%endblock%}
+{% block title %}ChatPage{%endblock%}
 {% block head %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
 <script src="{{url_for('static', filename='chat.js')}}"></script>  
@@ -9,18 +9,23 @@
 
 <div id="chat-card"class="card">
     <div class="card-header text-center">
-        <strong>{{channel.channelName}}</strong> | Owner: {{channel.creator}}
+        <strong>{{channel.channelName}}</strong> | Owner: <span id="creator">{{channel.creator}}</span>
     </div>
     <div id="chat-box-card" class="card-body">
         <ul id="chat-box" class="list-group list-group-flush">
         {% if msgs %} 
         {% for message in msgs %}
+            {%if message.user_name == channel.creator %}
+            <li class="list-group-item"><span class="time"><{{message.time}}> | </span><strong style='color: #0388fc;'>{{message.user_name}}</strong>: {{message.msg}}</li>
+            {% else %}
             <li class="list-group-item"><span class="time"><{{message.time}}> | </span><strong>{{message.user_name}}</strong>: {{message.msg}}</li>
+            {% endif %}
         {% endfor %}
         {% endif %}
         </ul>
     </div>
     <div class="card-footer text-muted">
+        <p id="typing-box"></p>
         <button id="leave-btn" class="btn btn-outline-dark">Leave Channel</button>
         {% if session.user_name == channel.creator %}
         <button class="btn btn-outline-danger" data-toggle="modal" data-target="#destory-modal" style="float: right;">Destroy</button>
@@ -49,7 +54,7 @@
 </div>
 <div id="chat-input" class="input-group mb-3">
     <div class="input-group-prepend">
-        <span class="input-group-text">{{session.user_name}}</span>
+        <span id="user_id" class="input-group-text">{{session.user_name}}</span>
       </div>
     <input id="input-text" type="text" class="form-control" placeholder="Type a message to send"aria-describedby="send-btn">
     <div class="input-group-append">

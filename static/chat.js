@@ -1,7 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     // namespace
     var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + '/')
-    var send_clicked = false
 
     socket.on('connect', () => {
         // let server know user has joined channel
@@ -17,17 +16,22 @@ document.addEventListener('DOMContentLoaded', () => {
     })
     // disable on empty message
     document.querySelector('#input-text').onkeyup = () => {
-        if (document.querySelector('#input-text').value.length > 0)
+        if (document.querySelector('#input-text').value.length > 0) {
             document.querySelector('#send-btn').disabled = false;
-        else
+            if (document.querySelector('#typing-box').innerHTML == '')
+                socket.emit('user typing', {'user': document.querySelector('#user_id').innerHTML})
+            }
+        else {
             document.querySelector('#send-btn').disabled = true;
+            if (document.querySelector('#typing-box').innerHTML != '')
+                socket.emit('typing cleared')
+        }
     };
 
     document.querySelector('#send-btn').onclick = () => {
         let time = new Date;
         time = time.toLocaleTimeString();
-        socket.emit('send message', {'msg': document.querySelector('#input-text').value, 'time': time})  
-        send_clicked = true   
+        socket.emit('send message', {'msg': document.querySelector('#input-text').value, 'time': time})    
         return false
     }
 
@@ -43,22 +47,36 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
+    socket.on('user is typing', data => {
+        document.querySelector('#typing-box').innerHTML = `${data['user']} is typing...`
+    })
+
+    socket.on('clear typing box', () => {
+        document.querySelector('#typing-box').innerHTML = ''
+    })
 
     socket.on('recieved message', data => {
         const li = document.createElement('li')
-        // If send_clicked by self
-        if (send_clicked) {
+        // If send by self
+        if (data.by == document.querySelector('#user_id').innerHTML) {
             li.classList.add('list-group-item')
             li.classList.add('list-group-item-dark')
-            send_clicked = false
         }
         else
             li.classList.add('list-group-item')
     
-        li.innerHTML = `<${data.time}> | <strong>${data.by}</strong>: ${data.msg}`
+        if (document.querySelector('#creator').innerHTML == data.by)
+            li.innerHTML = `<${data.time}> | <strong style='color: #0388fc;'>${data.by}</strong>: ${data.msg}`
+        else 
+            li.innerHTML = `<${data.time}> | <strong>${data.by}</strong>: ${data.msg}`
+        
         document.querySelector('#chat-box').append(li)
-        document.querySelector('#input-text').value = ''
+        // clear text field of user who sent the msg
+        if (data.by == document.querySelector('#user_id').innerHTML)
+            document.querySelector('#input-text').value = ''
+            
         document.querySelector('#send-btn').disabled = true;
+        socket.emit('typing cleared')
 
         // scrolling to bottom
         let container = document.querySelector('#chat-box')

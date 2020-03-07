@@ -181,6 +181,14 @@ def AnnounceMsg(data):
     room = session.get('last_channel')
     emit('recieved message', data, room=room, broadcast=True)
 
+@socketio.on('user typing')
+def AnnounceTyping(data):
+    emit('user is typing', data, room=session.get('last_channel'), broadcast=True)
+
+@socketio.on('typing cleared')
+def ClearTypingBox():
+    emit('clear typing box', room=session.get('last_channel'), broadcast=True)
+
 @app.route('/logout')
 def log_out():
 
