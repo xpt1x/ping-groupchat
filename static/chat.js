@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // namespace
     var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + '/')
     var send_clicked = false
+
     socket.on('connect', () => {
         // let server know user has joined channel
         socket.emit('user joined')
