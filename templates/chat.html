@@ -23,7 +23,27 @@
     <div class="card-footer text-muted">
         <button id="leave-btn" class="btn btn-outline-dark">Leave Channel</button>
         {% if session.user_name == channel.creator %}
-        <button id="destroy-btn" class="btn btn-outline-danger" style="float: right;">Destroy</button>
+        <button class="btn btn-outline-danger" data-toggle="modal" data-target="#destory-modal" style="float: right;">Destroy</button>
+        <!-- Modal -->
+        <div class="modal fade" id="destory-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Confirm deletion of <strong>{{channel.channelName}}</strong></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                </div>
+                <div class="modal-body">
+                <p>With deletion of this channel, all messages associated with this channel will also gets deleted from database</p>
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-outline-dark" data-dismiss="modal">Close</button>
+                <button id="destroy-btn" type="button" class="btn btn-outline-danger">Confirm Delete</button>
+                </div>
+            </div>
+            </div>
+        </div>
         {%endif%}
     </div>
 </div>
