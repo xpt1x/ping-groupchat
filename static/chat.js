@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.querySelector('#send-btn').click()
         }
     })
-
+    // disable on empty message
     document.querySelector('#input-text').onkeyup = () => {
         if (document.querySelector('#input-text').value.length > 0)
             document.querySelector('#send-btn').disabled = false;
