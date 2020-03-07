@@ -66,7 +66,7 @@ def index():
                 else:
                 # no last channel, so display all channels + create page
                     channels = Channel.query.all()
-                    return render_template('index.html', channels=channels)
+                    return render_template('index.html', channels=channels, sucmsg='Login successful')
             # display error alert
             else:
                 return render_template('login.html', errmsg='Wrong password! Please try again')
@@ -89,7 +89,7 @@ def register():
         # set local session username and send to home
         session['user_name'] = request.form.get('username')
         channels = Channel.query.all()
-        return render_template('index.html', channels=channels, succmsg='Registered successfully')
+        return render_template('index.html', channels=channels, sucmsg='Registered successfully')
     else:
         # user is redirected here
         return render_template('register.html')

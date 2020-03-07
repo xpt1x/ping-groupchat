@@ -3,6 +3,13 @@ body {
     font-family: Google Sans;
 }
 
+@media only screen and (max-width: 600px) {
+    
+    #chat-card {
+        display: block;
+    }
+}
+
 .top-heading
 {
     padding-top: 4%;
