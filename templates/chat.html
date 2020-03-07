@@ -15,7 +15,7 @@
         <ul id="chat-box" class="list-group list-group-flush">
         {% if msgs %} 
         {% for message in msgs %}
-            {%if message.user_name == channel.creator %}
+            {% if message.user_name == channel.creator %}
             <li class="list-group-item"><span class="time"><{{message.time}}> | </span><strong style='color: #0388fc;'>{{message.user_name}}</strong>: {{message.msg}}</li>
             {% else %}
             <li class="list-group-item"><span class="time"><{{message.time}}> | </span><strong>{{message.user_name}}</strong>: {{message.msg}}</li>

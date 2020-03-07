@@ -132,7 +132,7 @@ def SetChannel(channel):
     if not ichannel:
         return render_template('index.html', channels=channels, errmsg='Channel not found!')
     # fetch old messages ( limit by msg_limit )
-    msgs = Message.query.filter_by(channelName=channel).all()
+    msgs = Message.query.filter_by(channelName=channel).order_by(Message.id).all()
     msgs = msgs[-msg_limit:]
     # clicked any link and brought here
     return render_template('chat.html', channel=ichannel, channels=channels, msgs=msgs)
