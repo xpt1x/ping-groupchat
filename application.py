@@ -125,7 +125,10 @@ def SetChannel(channel):
     if not session.get('user_name'):
         return redirect(url_for('index'))
     # check for last channel for this user
+    same_channel = True
     if session.get('last_channel'):
+        if channel != session.get('last_channel'):
+            same_channel = False
         channel = session.get('last_channel')
     # validate the channel first
     ichannel = Channel.query.get(channel)
@@ -135,12 +138,12 @@ def SetChannel(channel):
     msgs = Message.query.filter_by(channelName=channel).order_by(Message.id).all()
     msgs = msgs[-msg_limit:]
     
-    if session.get('last_channel'):
+    if same_channel:
+        session['last_channel'] = channel
+        session['last_channel_creator'] = ichannel.creator
+        return render_template('chat.html', channel=ichannel, msgs=msgs)
+    else:
         return render_template('chat.html', channel=ichannel, msgs=msgs, warnmsg='Leave this channel first in order to join other')
-    # clicked join channel links
-    session['last_channel'] = channel
-    session['last_channel_creator'] = ichannel.creator
-    return render_template('chat.html', channel=ichannel, msgs=msgs)
 
 @socketio.on('user joined')
 def room_joined():
