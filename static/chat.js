@@ -83,10 +83,22 @@ document.addEventListener('DOMContentLoaded', () => {
     })
 
     socket.on('on user join', data => {
+        var div = document.getElementById('online-users')
+        while(div.hasChildNodes()) {
+            div.removeChild(div.firstChild)
+        }
         const li = document.createElement('li')
+        data.users.forEach(user => {
+            const a = document.createElement('a')
+            a.id = `user-${user}`
+            a.classList.add('dropdown-item')
+            a.innerHTML = user
+            document.getElementById('online-users').appendChild(a)
+        });
+        
         li.classList.add('list-group-item')
         li.innerHTML = `<strong>${data.user_name}</strong> has joined the channel`
-        
+
         document.querySelector('#chat-box').append(li)
         let container = document.querySelector('#chat-box')
         container.scrollTop = (container.scrollHeight + container.offsetHeight);
@@ -97,6 +109,19 @@ document.addEventListener('DOMContentLoaded', () => {
         const li = document.createElement('li')
         li.classList.add('list-group-item')
         li.innerHTML = `<strong>${data.user_name}</strong> has left the channel`
+        
+        var div = document.getElementById('online-users')
+        while(div.hasChildNodes()) {
+            div.removeChild(div.firstChild)
+        }
+        data.users.forEach(user => {
+            const a = document.createElement('a')
+            a.id = `user-${user}`
+            a.classList.add('dropdown-item')
+            a.innerHTML = user
+            document.getElementById('online-users').appendChild(a)
+        });
+
         document.querySelector('#chat-box').append(li)
 
         let container = document.querySelector('#chat-box')

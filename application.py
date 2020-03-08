@@ -11,6 +11,7 @@ socketio = SocketIO(app)
 
 # 100 as prescribed in docs
 msg_limit = 100
+Channels = dict()
 
 # Check for environment variable, API KEY, SECRET KEY
 if not os.getenv("DATABASE_URL"):
@@ -110,6 +111,7 @@ def channel():
         channel = Channel(request.form.get('channel'), session.get('user_name'))
         db.session.add(channel)
         db.session.commit()
+        Channels[request.form.get('channel')] = dict()
         # set last channel for this user
         session['last_channel'] = request.form.get('channel')
         session['last_channel_creator'] = channel.creator
@@ -149,9 +151,13 @@ def SetChannel(channel):
 def room_joined():
     room = session.get('last_channel')
     join_room(room)
+    if room not in Channels:
+        Channels[room] = dict()
+    Channels[room][session.get('user_name')] = session.get('user_name')
     emit('on user join', {
         'user_name': session.get('user_name'),
-        'channel': session.get('last_channel')
+        'channel': session.get('last_channel'),
+        'users': list(Channels[room].keys())
     }, room=room, broadcast=True)
 
 @socketio.on('channel destroy clicked')
@@ -175,11 +181,13 @@ def destroy_channel():
 def room_left():
     room = session.get('last_channel')
     leave_room(room)
+    Channels[room].pop(session.get('user_name'), None)
     if session.get('last_channel'):
         session.pop('last_channel', None)
         session.pop('last_channel_creator', None)
     emit('left announce', {
         'user_name': session.get('user_name'),
+        'users': list(Channels[room].keys())
     }, room=room)
 
 @socketio.on('send message')

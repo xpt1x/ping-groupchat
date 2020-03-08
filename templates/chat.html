@@ -11,6 +11,15 @@
     <div class="card-header text-center">
         <strong>{{channel.channelName}}</strong> | Owner: <span id="creator">{{channel.creator}}</span>
     </div>
+    <ul class="nav nav-tabs">
+        <li class="nav-item">
+          <a class="nav-link active">Chat</a>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Online Users</a>
+          <div id="online-users" class="dropdown-menu"></div>
+        </li>
+    </ul>
     <div id="chat-box-card" class="card-body">
         <ul id="chat-box" class="list-group list-group-flush">
         {% if msgs %} 
