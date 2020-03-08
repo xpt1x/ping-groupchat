@@ -40,6 +40,7 @@ def index():
                 # send user to the last channel chat page
                 return redirect('/channels/' + session.get('last_channel'))
             else:
+                # show index page to create or join channel
                 channels = Channel.query.all()
                 return render_template('index.html', channels=channels)
         else:
@@ -61,7 +62,7 @@ def index():
             if check_password_hash(user.password, request.form.get('password')):
                 session['user_name'] = user.user_name
                 # send to last channel chat page
-                if 'last_channel' in session:
+                if session.get('last_channel'):
                     return redirect('/channels/' + session.get('last_channel'))
                 else:
                 # no last channel, so display all channels + create page
@@ -113,8 +114,7 @@ def channel():
         session['last_channel'] = request.form.get('channel')
         session['last_channel_creator'] = channel.creator
         # send user to chat page
-        channels = Channel.query.all()
-        return render_template('chat.html', channel=channel, channels=channels, sucmsg='Channel created successfully')
+        return render_template('chat.html', channel=channel, sucmsg='Channel created successfully')
     else:
         # user is redirected here
         return redirect(url_for('index'))
@@ -124,20 +124,23 @@ def SetChannel(channel):
     # update user's last channel
     if not session.get('user_name'):
         return redirect(url_for('index'))
-    # fetch info for channel and other channels
-    channels = Channel.query.all()
+    # check for last channel for this user
+    if session.get('last_channel'):
+        channel = session.get('last_channel')
     # validate the channel first
     ichannel = Channel.query.get(channel)
     if not ichannel:
-        return render_template('index.html', channels=channels, errmsg='Channel not found!')
-
-    session['last_channel'] = channel
-    session['last_channel_creator'] = ichannel.creator
+        return render_template('index.html', channels=Channel.query.all(), errmsg='Channel not found!')
     # fetch old messages ( limit by msg_limit )
     msgs = Message.query.filter_by(channelName=channel).order_by(Message.id).all()
     msgs = msgs[-msg_limit:]
-    # clicked any link and brought here
-    return render_template('chat.html', channel=ichannel, channels=channels, msgs=msgs)
+    
+    if session.get('last_channel'):
+        return render_template('chat.html', channel=ichannel, msgs=msgs, warnmsg='Leave this channel first in order to join other')
+    # clicked join channel links
+    session['last_channel'] = channel
+    session['last_channel_creator'] = ichannel.creator
+    return render_template('chat.html', channel=ichannel, msgs=msgs)
 
 @socketio.on('user joined')
 def room_joined():
