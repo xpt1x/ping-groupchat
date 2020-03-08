@@ -111,6 +111,7 @@ def channel():
         db.session.commit()
         # set last channel for this user
         session['last_channel'] = request.form.get('channel')
+        session['last_channel_creator'] = channel.creator
         # send user to chat page
         channels = Channel.query.all()
         return render_template('chat.html', channel=channel, channels=channels, sucmsg='Channel created successfully')
@@ -123,16 +124,17 @@ def SetChannel(channel):
     # update user's last channel
     if not session.get('user_name'):
         return redirect(url_for('index'))
-    session['last_channel'] = channel
     # fetch info for channel and other channels
     channels = Channel.query.all()
     # validate the channel first
     ichannel = Channel.query.get(channel)
-    
     if not ichannel:
         return render_template('index.html', channels=channels, errmsg='Channel not found!')
+
+    session['last_channel'] = channel
+    session['last_channel_creator'] = ichannel.creator
     # fetch old messages ( limit by msg_limit )
-    msgs = Message.query.filter_by(channelName=channel).all()
+    msgs = Message.query.filter_by(channelName=channel).order_by(Message.id).all()
     msgs = msgs[-msg_limit:]
     # clicked any link and brought here
     return render_template('chat.html', channel=ichannel, channels=channels, msgs=msgs)
@@ -158,14 +160,18 @@ def destroy_channel():
     db.session.delete(Channel.query.get(room))
     db.session.commit()
 
-    session.pop('last_channel', None)
+    if session.get('last_channel'):
+        session.pop('last_channel', None)
+        session.pop('last_channel_creator', None)
     emit('destroy announce', room=room)
 
 @socketio.on('user left')
 def room_left():
     room = session.get('last_channel')
     leave_room(room)
-    session.pop('last_channel', None)
+    if session.get('last_channel'):
+        session.pop('last_channel', None)
+        session.pop('last_channel_creator', None)
     emit('left announce', {
         'user_name': session.get('user_name'),
     }, room=room)
@@ -174,16 +180,24 @@ def room_left():
 def AnnounceMsg(data):
     # add data to DB
     msg = Message(msg=data['msg'], user_name=session.get('user_name') , channelName=session.get('last_channel'), time=data['time'])
-    data['by'] = session.get('user_name')
+    
     db.session.add(msg)
     db.session.commit()
+    data['by'] = session.get('user_name')
+    form_msg = ''
 
+    if session.get('last_channel_creator') == data['by']:
+        form_msg = f"<{data['time']}> | <strong style='color: #0388fc;'>{data['by']}</strong>: {data['msg']}"
+    else:
+        form_msg = f"<{data['time']}> | <strong>{data['by']}</strong>: {data['msg']}"
+
+    data['form_msg'] = form_msg
     room = session.get('last_channel')
     emit('recieved message', data, room=room, broadcast=True)
 
 @socketio.on('user typing')
-def AnnounceTyping(data):
-    emit('user is typing', data, room=session.get('last_channel'), broadcast=True)
+def AnnounceTyping():
+    emit('user is typing', {'user': session.get('user_name')}, room=session.get('last_channel'), broadcast=True)
 
 @socketio.on('typing cleared')
 def ClearTypingBox():
@@ -196,6 +210,9 @@ def log_out():
         session.pop('last_channel')
     if session.get('user_name'):
         session.pop('user_name')
+    if session.get('last_channel_creator'):
+        session.pop('last_channel_creator')
+
     return redirect(url_for('index'))
 
 @app.route('/leave')

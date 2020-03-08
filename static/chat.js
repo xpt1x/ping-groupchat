@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // namespace
+
     var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + '/')
+    var send_clicked = false
 
     socket.on('connect', () => {
         // let server know user has joined channel
@@ -19,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (document.querySelector('#input-text').value.length > 0) {
             document.querySelector('#send-btn').disabled = false;
             if (document.querySelector('#typing-box').innerHTML == '')
-                socket.emit('user typing', {'user': document.querySelector('#user_id').innerHTML})
+                socket.emit('user typing')
             }
         else {
             document.querySelector('#send-btn').disabled = true;
@@ -31,6 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelector('#send-btn').onclick = () => {
         let time = new Date;
         time = time.toLocaleTimeString();
+        send_clicked = true
         socket.emit('send message', {'msg': document.querySelector('#input-text').value, 'time': time})    
         return false
     }
@@ -58,22 +60,19 @@ document.addEventListener('DOMContentLoaded', () => {
     socket.on('recieved message', data => {
         const li = document.createElement('li')
         // If send by self
-        if (data.by == document.querySelector('#user_id').innerHTML) {
+        if (send_clicked) {
+            // additional styling
             li.classList.add('list-group-item')
             li.classList.add('list-group-item-dark')
+            // setting user's fields to original state
+            document.querySelector('#input-text').value = ''
+            send_clicked = false
         }
         else
             li.classList.add('list-group-item')
-    
-        if (document.querySelector('#creator').innerHTML == data.by)
-            li.innerHTML = `<${data.time}> | <strong style='color: #0388fc;'>${data.by}</strong>: ${data.msg}`
-        else 
-            li.innerHTML = `<${data.time}> | <strong>${data.by}</strong>: ${data.msg}`
         
+        li.innerHTML = data.form_msg
         document.querySelector('#chat-box').append(li)
-        // clear text field of user who sent the msg
-        if (data.by == document.querySelector('#user_id').innerHTML)
-            document.querySelector('#input-text').value = ''
             
         document.querySelector('#send-btn').disabled = true;
         socket.emit('typing cleared')
