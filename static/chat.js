@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
         else
             li.classList.add('list-group-item')
         
-        li.innerHTML = data.form_msg
+        li.innerHTML = data.form_msg + `<span id="time" style="float: right;" class="badge badge-secondary badge-pill">${data.time}</span>`
         document.querySelector('#chat-box').append(li)
             
         document.querySelector('#send-btn').disabled = true;

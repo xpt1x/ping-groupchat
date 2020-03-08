@@ -187,9 +187,9 @@ def AnnounceMsg(data):
     form_msg = ''
 
     if session.get('last_channel_creator') == data['by']:
-        form_msg = f"<{data['time']}> | <strong style='color: #0388fc;'>{data['by']}</strong>: {data['msg']}"
+        form_msg = f"<strong style='color: #0388fc;'>{data['by']}</strong>: {data['msg']}"
     else:
-        form_msg = f"<{data['time']}> | <strong>{data['by']}</strong>: {data['msg']}"
+        form_msg = f"<strong>{data['by']}</strong>: {data['msg']}"
 
     data['form_msg'] = form_msg
     room = session.get('last_channel')

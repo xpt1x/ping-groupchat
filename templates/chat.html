@@ -16,9 +16,13 @@
         {% if msgs %} 
         {% for message in msgs %}
             {% if message.user_name == channel.creator %}
-            <li class="list-group-item"><span class="time"><{{message.time}}> | </span><strong style='color: #0388fc;'>{{message.user_name}}</strong>: {{message.msg}}</li>
+            <li class="list-group-item"><strong style='color: #0388fc;'>{{message.user_name}}</strong>: {{message.msg}}
+                <span id="time" style="float: right;" class="badge badge-secondary badge-pill">{{message.time}}</span>
+            </li>
             {% else %}
-            <li class="list-group-item"><span class="time"><{{message.time}}> | </span><strong>{{message.user_name}}</strong>: {{message.msg}}</li>
+            <li class="list-group-item"><strong>{{message.user_name}}</strong>: {{message.msg}}
+                <span id="time" style="float: right;" class="badge badge-secondary badge-pill">{{message.time}}</span>
+            </li>
             {% endif %}
         {% endfor %}
         {% endif %}
