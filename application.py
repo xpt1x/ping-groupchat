@@ -244,6 +244,21 @@ def LeaveRoute():
 
     return redirect(url_for('index'))
 
+@app.route('/user', methods=['POST'])
+def UserPanel():
+    channels = Channel.query.all()
+    if not request.form.get('newpass'):
+        return render_template('index.html', channels=channels, errmsg='Must provide new password')
+    if not request.form.get('confirmpass'):
+        return render_template('index.html', channels=channels, errmsg='Must provide confirmation of new password')
+    if request.form.get('newpass') != request.form.get('confirmpass'):
+        return render_template('index.html', channels=channels, errmsg='Passwords doesnt match, retry')
+    
+    user = User.query.get(session.get('user_name'))
+    user.password = generate_password_hash(request.form.get('newpass'), method='pbkdf2:sha256', salt_length=8)
+    db.session.commit()
+    return render_template('index.html', channels=channels, sucmsg='Password updated Successfully')
+
 @app.route('/admin')
 def AdminLogin():
     if not session.get('user_name'):
