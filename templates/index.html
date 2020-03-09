@@ -1,6 +1,18 @@
 {% extends 'base.html' %}
 {% block title %} HomePage {%endblock%}
-{%block tt%} Create a Channel <hr><small class="text-muted"> Or Join channels by others</small> {%endblock%}
+{%block tt%} Create your own Channel <hr><small class="text-muted"> Or Join a channel</small>
+<div style="padding-top: 1%;" class="dropdown">
+  <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    Channel by others
+  </button>
+  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+    {% for channel in channels %}
+    <a class="dropdown-item" href="/channels/{{channel.channelName}}">{{ channel.channelName }}</a>
+    {% endfor %}
+  </div>
+</div> 
+{%endblock%}
+
 {%block body %}
 <form action="{{url_for('channel')}}" method="POST">
     <div class="form-group">
