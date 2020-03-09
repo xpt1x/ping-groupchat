@@ -5,6 +5,7 @@ from flask_session import Session
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_socketio import SocketIO, emit, join_room, leave_room
 from models import *
+from sqlalchemy import and_
 
 app = Flask(__name__)
 socketio = SocketIO(app)
@@ -76,6 +77,7 @@ def index():
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
+    # filled registeration form
     if request.method == 'POST':
         # validate fields
         if not request.form.get('username'):
@@ -95,6 +97,8 @@ def register():
         return render_template('index.html', channels=channels, sucmsg='Registered successfully')
     else:
         # user is redirected here
+        if session.get('user_name'):
+            return redirect(url_for('index'))
         return render_template('register.html')
 
 @app.route('/channel', methods=['GET', 'POST'])
@@ -239,6 +243,25 @@ def LeaveRoute():
         session.pop('last_channel', None)
 
     return redirect(url_for('index'))
+
+@app.route('/admin')
+def AdminLogin():
+    if not session.get('user_name'):
+        return render_template('login.html', errmsg='Please login first, then visit admin route')
+    # make first one to visit this route --> ADMIN 
+    if not User.query.filter_by(admin = True).all():
+        user = User.query.get(session.get('user_name'))
+        user.admin = True
+        db.session.commit()
+        return 'YOU ARE ADDDED AS ADMIN'
+    # there exists an admin
+    else:
+        admin = User.query.filter(and_(User.user_name == session.get('user_name'), User.admin == True)).all()
+        if not admin:
+            return redirect(url_for('index'))
+        else:
+            # show admin dashboard
+            return 'WELCOME MR. ADMIN <br>----- WIP -----'
 
 @app.before_request
 def make_session_permanent():

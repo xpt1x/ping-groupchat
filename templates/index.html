@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% block title %} HomePage {%endblock%}
-{%block tt%} Create / Join a Channel {%endblock%}
+{%block tt%} Create a Channel <hr><small class="text-muted"> Or Join channels by others</small> {%endblock%}
 {%block body %}
 <form action="{{url_for('channel')}}" method="POST">
     <div class="form-group">

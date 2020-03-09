@@ -6,6 +6,7 @@ class User(db.Model):
     __tablename__ = 'users'
     user_name = db.Column(db.String, primary_key = True, nullable=False)
     password = db.Column(db.String, nullable = False)
+    admin = db.Column(db.Boolean, default=False)
 
     def __init__(self, user_name, password):
         self.user_name = user_name

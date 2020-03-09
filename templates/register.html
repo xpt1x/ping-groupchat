@@ -4,7 +4,7 @@
 {% block body %}
 <form action="{{url_for('register')}}" method="POST">
     <div class="form-group">
-      <label for="exampleInputEmail1">UserName</label>
+      <label for="exampleInputEmail1">User Name</label>
       <input type="text" class="form-control" id="exampleInputEmail1" name="username" aria-describedby="emailHelp">
       <small id="userHelp" class="form-text text-muted">This would be your display name throughout the app</small>
     </div>
@@ -15,4 +15,54 @@
     </div>
     <button type="submit" class="btn btn-outline-primary btn-lg btn-block">Create Account</button>
 </form>
+<br><br>
+<div class="text-center">
+  <button class="btn btn-outline-success btn-lg btn-block" data-toggle="modal" data-target="#feature-modal">Display App Features</button>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="feature-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">Features of <strong>Ping</strong> Minimalistic Chat</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        </div>
+        <div class="modal-body">
+        <ul class="text-muted">
+          <li>User Login / Registeration</li>
+          <li>Channel Creation, Join</li>
+          <li>Insanely fast chat sync</li>
+          <li>256Bit-Encrypted passwords</li>
+          <li>User sessions for remembering user info</li>
+          <li>Mobile responsive</li>
+
+          <li>Online users in current channel</li>
+          <li>Chat messages history</li>
+          <li>Shows user who is typing something in channel</li>
+          <li>Option to leave channel anytime</li>
+          <li>Name styling for Channel owner</li>
+          <li>Destroy channel option for channel owners</li>
+
+          <li>Message styling for self message</li>
+          <li>Press Enter to send for all users</li>
+          <li>Timestamp of every message</li>
+
+          <li>Appropriate alert messages for error handling</li>
+          <li>Disallowing empty messages</li>
+          <li>Created keeping security in mind</li>
+          <hr>
+          <li>*WIP* Admin dashboard</li>
+          <li>*WIP* User panel</li>
+
+        </ul>
+        </div>
+        <div class="modal-footer">
+        <button type="button" class="btn btn-outline-dark" data-dismiss="modal">Close</button>
+        </div>
+    </div>
+    </div>
+</div>
+
 {%endblock%}
