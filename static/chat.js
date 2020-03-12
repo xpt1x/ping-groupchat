@@ -3,6 +3,11 @@ document.addEventListener('DOMContentLoaded', () => {
     var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + '/')
     var send_clicked = false
 
+    function ScrollToBottom() {
+        let container = document.querySelector('#chat-box')
+        container.scrollTop = (container.scrollHeight + container.offsetHeight);
+    }
+
     socket.on('connect', () => {
         // let server know user has joined channel
         socket.emit('user joined')
@@ -48,6 +53,13 @@ document.addEventListener('DOMContentLoaded', () => {
             window.location.replace('/leave')
         }
     }
+
+    if (document.getElementById("prune-btn")) {
+        document.querySelector('#prune-btn').onclick = () => {
+            socket.emit('chat prune clicked')
+            //window.location.replace('/')
+        }
+    }
     
     socket.on('user is typing', data => {
         document.querySelector('#typing-box').innerHTML = `${data['user']} is typing...`
@@ -78,8 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
         socket.emit('typing cleared')
 
         // scrolling to bottom
-        let container = document.querySelector('#chat-box')
-        container.scrollTop = (container.scrollHeight + container.offsetHeight);
+        ScrollToBottom()
     })
 
     socket.on('on user join', data => {
@@ -100,8 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
         li.innerHTML = `<strong>${data.user_name}</strong> has joined the channel`
 
         document.querySelector('#chat-box').append(li)
-        let container = document.querySelector('#chat-box')
-        container.scrollTop = (container.scrollHeight + container.offsetHeight);
+        ScrollToBottom()
     })
 
     socket.on('left announce', data => {
@@ -124,12 +134,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
         document.querySelector('#chat-box').append(li)
 
-        let container = document.querySelector('#chat-box')
-        container.scrollTop = (container.scrollHeight + container.offsetHeight);
+        ScrollToBottom()
     })
 
     socket.on('destroy announce', data =>{
         window.alert('Channel Destroyed')
         window.location.replace('/leave')
+    })
+
+    socket.on('prune announce', data =>{
+        const li = document.createElement('li')
+        li.classList.add('list-group-item')
+        li.innerHTML = `Owner <strong>${data.user_name}</strong> has pruned the chat`
+
+        document.querySelector('#chat-box').append(li)
+        ScrollToBottom()
+        window.location.replace('/')
     })
 })

@@ -198,6 +198,16 @@ def destroy_channel():
         session.pop('last_channel_creator', None)
     emit('destroy announce', room=room)
 
+@socketio.on('chat prune clicked')
+def PruneChat():
+    room = session.get('last_channel')
+    # deleting all messages associated with channel
+    all_msgs = Message.__table__.delete().where(Message.channelName == room)
+    db.session.execute(all_msgs)
+    db.session.commit()
+
+    emit('prune announce', {'user_name': session.get('user_name')}, room=room)   
+
 @socketio.on('send message')
 def AnnounceMsg(data):
     # add data to DB
@@ -281,7 +291,7 @@ def AdminLogin():
 @app.before_request
 def BeforeRequest():
     session.permanent = True
-    if not request.is_secure and app.env != "development":
+    if not request.is_secure and app.env != "DEVELOPMENT":
         url = request.url.replace("http://", "https://", 1)
         code = 301
         return redirect(url, code=code)

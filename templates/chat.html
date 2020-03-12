@@ -41,8 +41,37 @@
         <p id="typing-box"></p>
         <button id="leave-btn" class="btn btn-outline-dark">Leave Channel</button>
         {% if session.user_name == channel.creator %}
-        <button class="btn btn-outline-danger" data-toggle="modal" data-target="#destory-modal" style="float: right;">Destroy</button>
-        <!-- Modal -->
+        <div style="float: right;" class="btn-group dropup">
+            <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Mod Options
+            </button>
+            <div class="dropdown-menu">
+                <button class="dropdown-item" type="button" data-toggle="modal" data-target="#destory-modal">Destroy Channel</button>
+                <button class="dropdown-item" type="button" data-toggle="modal" data-target="#prune-modal">Prune Chat</button>
+            </div>
+        </div>
+        
+        <!-- Modals -->
+        <div class="modal fade" id="prune-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Prune all messages in <strong>{{channel.channelName}}</strong></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                </div>
+                <div class="modal-body">
+                <p>All messages associated with this channel will get cleared from messages history and database</p>
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-outline-dark" data-dismiss="modal">Close</button>
+                <button id="prune-btn" type="button" class="btn btn-outline-danger">Prune Chat</button>
+                </div>
+            </div>
+            </div>
+        </div>
+        <!-- Destory modal -->
         <div class="modal fade" id="destory-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
