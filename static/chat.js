@@ -57,7 +57,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (document.getElementById("prune-btn")) {
         document.querySelector('#prune-btn').onclick = () => {
             socket.emit('chat prune clicked')
-            //window.location.replace('/')
         }
     }
     
@@ -143,12 +142,12 @@ document.addEventListener('DOMContentLoaded', () => {
     })
 
     socket.on('prune announce', data =>{
+        document.querySelector('#chat-box').innerHTML = ''
         const li = document.createElement('li')
         li.classList.add('list-group-item')
         li.innerHTML = `Owner <strong>${data.user_name}</strong> has pruned the chat`
 
         document.querySelector('#chat-box').append(li)
         ScrollToBottom()
-        window.location.replace('/')
     })
 })

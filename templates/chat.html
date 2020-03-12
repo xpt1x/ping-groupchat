@@ -41,7 +41,7 @@
         <p id="typing-box"></p>
         <button id="leave-btn" class="btn btn-outline-dark">Leave Channel</button>
         {% if session.user_name == channel.creator %}
-        <div style="float: right;" class="btn-group dropup">
+        <div class="btn-group dropup">
             <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               Mod Options
             </button>
@@ -66,7 +66,7 @@
                 </div>
                 <div class="modal-footer">
                 <button type="button" class="btn btn-outline-dark" data-dismiss="modal">Close</button>
-                <button id="prune-btn" type="button" class="btn btn-outline-danger">Prune Chat</button>
+                <button id="prune-btn" type="button" data-dismiss="modal" class="btn btn-outline-danger">Prune Chat</button>
                 </div>
             </div>
             </div>
@@ -86,7 +86,7 @@
                 </div>
                 <div class="modal-footer">
                 <button type="button" class="btn btn-outline-dark" data-dismiss="modal">Close</button>
-                <button id="destroy-btn" type="button" class="btn btn-outline-danger">Confirm Delete</button>
+                <button id="destroy-btn" type="button" data-dismiss="modal" class="btn btn-outline-danger">Confirm Delete</button>
                 </div>
             </div>
             </div>

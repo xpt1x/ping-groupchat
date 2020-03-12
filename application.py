@@ -36,7 +36,7 @@ def index():
         if session.get('user_name'):
             # additional check for user details
             if not User.query.get(session.get('user_name')):
-                session.pop('user_name')
+                session.pop('user_name', None)
                 return render_template('login.html', warnmsg='Please login again')
             # if user has no last channel
             if session.get('last_channel'):
@@ -170,9 +170,8 @@ def room_left():
     room = session.get('last_channel')
     leave_room(room)
     Channels[room].remove(session.get('user_name'))
-    if session.get('last_channel'):
-        session.pop('last_channel', None)
-        session.pop('last_channel_creator', None)
+    session.pop('last_channel', None)
+    session.pop('last_channel_creator', None)
     emit('left announce', {
         'user_name': session.get('user_name'),
         'users': list(Channels[room])
@@ -193,10 +192,9 @@ def destroy_channel():
     db.session.delete(Channel.query.get(room))
     db.session.commit()
 
-    if session.get('last_channel'):
-        session.pop('last_channel', None)
-        session.pop('last_channel_creator', None)
-    emit('destroy announce', room=room)
+    session.pop('last_channel', None)
+    session.pop('last_channel_creator', None)
+    emit('destroy announce', room=room, broadcast=True)
 
 @socketio.on('chat prune clicked')
 def PruneChat():
@@ -237,21 +235,16 @@ def ClearTypingBox():
 
 @app.route('/logout')
 def log_out():
-
-    if session.get('last_channel'):
-        session.pop('last_channel')
-    if session.get('user_name'):
-        session.pop('user_name')
-    if session.get('last_channel_creator'):
-        session.pop('last_channel_creator')
+    session.pop('last_channel', None)
+    session.pop('user_name', None)
+    session.pop('last_channel_creator', None)
 
     return redirect(url_for('index'))
 
 @app.route('/leave')
 def LeaveRoute():
-    if session.get('last_channel'):
-        session.pop('last_channel', None)
-
+    session.pop('last_channel', None)
+    session.pop('last_channel_creator', None)
     return redirect(url_for('index'))
 
 @app.route('/user', methods=['POST'])
