@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    var socket = io.connect('https://' + document.domain + ':' + location.port + '/')
+    var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + '/')
     var send_clicked = false
 
     socket.on('connect', () => {

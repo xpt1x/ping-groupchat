@@ -279,8 +279,12 @@ def AdminLogin():
             return 'WELCOME MR. ADMIN <br>----- WIP -----'
 
 @app.before_request
-def make_session_permanent():
+def BeforeRequest():
     session.permanent = True
+    if not request.is_secure and app.env != "development":
+        url = request.url.replace("http://", "https://", 1)
+        code = 301
+        return redirect(url, code=code)
 
 if __name__ == '__main__':
     socketio.run(app, debug=True)
