@@ -34,3 +34,13 @@ class Message(db.Model):
         self.user_name = user_name
         self.channelName = channelName
         self.time = time
+
+class BannedUser(db.Model):
+    __tablename__ = 'banned'
+    id = db.Column(db.Integer, primary_key=True, nullable=False)
+    channel = db.Column(db.String, nullable=False)
+    user = db.Column(db.String, nullable=False)
+
+    def __init__(self, channel, user):
+        self.channel = channel
+        self.user = user

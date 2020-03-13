@@ -1,6 +1,6 @@
 import os, requests, socket
 
-from flask import Flask, session, render_template, url_for, redirect, g, request, redirect
+from flask import Flask, session, render_template, url_for, redirect, g, request, redirect, jsonify
 from flask_session import Session
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_socketio import SocketIO, emit, join_room, leave_room
@@ -262,6 +262,15 @@ def UserPanel():
     db.session.commit()
     return render_template('index.html', channels=channels, sucmsg='Password updated Successfully')
 
+@app.route('/userinfo/<channel>')
+def SendUsersInfo(channel):
+    if channel in Channels.keys():
+        return jsonify({'status': 200, 'users':list(Channels[channel])})
+    #else return 404
+    #handle empty user list too !
+    else:
+        return jsonify({'status': 404})
+
 @app.route('/admin')
 def AdminLogin():
     if not session.get('user_name'):
@@ -286,8 +295,7 @@ def BeforeRequest():
     session.permanent = True
     if not request.is_secure and app.env != "DEVELOPMENT":
         url = request.url.replace("http://", "https://", 1)
-        code = 301
-        return redirect(url, code=code)
+        return redirect(url, code=301)
 
 if __name__ == '__main__':
     socketio.run(app, debug=True)

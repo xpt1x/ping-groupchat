@@ -1,10 +1,18 @@
 {% extends 'base.html' %}
 {% block title %} HomePage {%endblock%}
-{%block tt%} Create your own Channel <hr>
+
+{%block tt%} 
 {% if channels %}
-<small class="text-muted">Or Join a channel</small>
-<div style="padding-top: 1%;" class="dropdown">
-  <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+Join an existing channel
+{%else%}
+<small class="text-muted">Umm seems like there are no active channels to join</small><hr>
+{%endif%}
+{%endblock%}
+
+{%block body %}
+{% if channels %}
+<div class="dropdown text-center">
+  <button class="btn btn-primary btn-lg dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
     Active Channels List
   </button>
   <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
@@ -13,18 +21,22 @@
     {% endfor %}
   </div>
 </div> 
-{% else %}
-<small class="text-muted">Umm seems like there are no active channels to join</small>
 {% endif %}
-{%endblock%}
-
-{%block body %}
+<div class="row text-center">
+  <div class="col-12">
+      {%if channels %} 
+      <h2 class="top-heading text-muted">Or create your own channel</h2>
+      {%else%}
+      <h2 class="top-heading">Create your own channel</h2>
+      {%endif%}
+  </div>
+</div>
 <form action="{{url_for('channel')}}" method="POST">
-    <div class="form-group">
-      <label for="exampleChannel">Channel Name</label>
-      <input id="exampleChannel" name="channel" type="text" class="form-control">
-      <small class="form-text text-muted">Name of channel must be unique</small>
-    </div>
-    <button type="submit" class="btn btn-outline-success btn-lg btn-block">Create Channel</button>
+  <div class="form-group">
+    <label for="exampleChannel">Channel Name</label>
+    <input id="exampleChannel" name="channel" type="text" class="form-control">
+    <small class="form-text text-muted">Name of channel must be unique</small>
+  </div>
+  <button type="submit" class="btn btn-outline-success btn-lg btn-block">Create Channel</button>
 </form>
 {%endblock%}

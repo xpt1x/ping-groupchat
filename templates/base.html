@@ -69,14 +69,8 @@
 
             </div>
         </nav>
-        <!-- <div class="container mx-auto"> -->
+        
         <main class="container p-5">
-            <div class="row text-center">
-                <div class="col-12">
-                    <h1 class="top-heading">{%block tt %} {%endblock%}</h1>
-                </div>
-            </div>
-            <!-- ALERTS -->
             {% if errmsg %}
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
                 {{errmsg}}
@@ -103,7 +97,12 @@
                 </button>
             </div>
             {%endif%}
-            <!-- END ALERTS -->
+            
+            <div class="row text-center">
+                <div class="col-12">
+                    <h1 class="top-heading">{%block tt %} {%endblock%}</h1>
+                </div>
+            </div>
             {% block body %}
             {% endblock %}
             
