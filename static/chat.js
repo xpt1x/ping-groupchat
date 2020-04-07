@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
             socket.emit('chat prune clicked')
         }
     }
-    
+
     socket.on('user is typing', data => {
         document.querySelector('#typing-box').innerHTML = `${data['user']} is typing...`
     })

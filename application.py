@@ -116,6 +116,7 @@ def channel():
         channel = Channel(request.form.get('channel'), session.get('user_name'))
         db.session.add(channel)
         db.session.commit()
+        #update local dict and add this channel, create a empty obj
         Channels[request.form.get('channel')] = set()
         # set last channel for this user
         session['last_channel'] = request.form.get('channel')
@@ -126,31 +127,34 @@ def channel():
         # user is redirected here
         return redirect(url_for('index'))
 
-@app.route('/channels/<channel>')
-def SetChannel(channel):
-    # update user's last channel
+@app.route('/channels/<qchannel>')
+def SetChannel(qchannel):
     if not session.get('user_name'):
         return redirect(url_for('index'))
     # check for last channel for this user
     same_channel = True
+
     if session.get('last_channel'):
-        if channel != session.get('last_channel'):
+        last_channel = Channel.query.get(session.get('last_channel'))
+        # check if its valid or not
+        if last_channel:
+            # channel exists
+            ichannel = last_channel
+        else:
             same_channel = False
-        channel = session.get('last_channel')
-    # validate the channel first
-    ichannel = Channel.query.get(channel)
+
+    if not same_channel or not session.get('last_channel'):
+        ichannel = Channel.query.get(qchannel)
+
     if not ichannel:
         return render_template('index.html', channels=Channel.query.all(), errmsg='Channel not found!')
     # fetch old messages ( limit by msg_limit )
-    msgs = Message.query.filter_by(channelName=channel).order_by(Message.id).all()
+    msgs = Message.query.filter_by(channelName=ichannel.channelName).order_by(Message.id).all()
     msgs = msgs[-msg_limit:]
     
-    if same_channel:
-        session['last_channel'] = channel
-        session['last_channel_creator'] = ichannel.creator
-        return render_template('chat.html', channel=ichannel, msgs=msgs)
-    else:
-        return render_template('chat.html', channel=ichannel, msgs=msgs, warnmsg='Leave this channel first in order to join other')
+    session['last_channel'] = ichannel.channelName
+    session['last_channel_creator'] = ichannel.creator
+    return render_template('chat.html', channel=ichannel, msgs=msgs)
 
 @socketio.on('user joined')
 def room_joined():
@@ -254,7 +258,7 @@ def UserPanel():
         return render_template('index.html', channels=channels, errmsg='Must provide new password')
     if not request.form.get('confirmpass'):
         return render_template('index.html', channels=channels, errmsg='Must provide confirmation of new password')
-    if request.form.get('newpass') != request.form.get('confirmpass'):
+    if request.form.get('newpass') != request.form.get('confirmpass'):  
         return render_template('index.html', channels=channels, errmsg='Passwords doesnt match, retry')
     
     user = User.query.get(session.get('user_name'))
@@ -262,6 +266,8 @@ def UserPanel():
     db.session.commit()
     return render_template('index.html', channels=channels, sucmsg='Password updated Successfully')
 
+# ------------ WIP --------------
+# ------------ WIP --------------
 @app.route('/userinfo/<channel>')
 def SendUsersInfo(channel):
     if channel in Channels.keys():
@@ -289,6 +295,8 @@ def AdminLogin():
         else:
             # show admin dashboard
             return 'WELCOME MR. ADMIN <br>----- WIP -----'
+# ------------ WIP --------------
+# ------------ WIP --------------
 
 @app.before_request
 def BeforeRequest():

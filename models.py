@@ -14,7 +14,7 @@ class User(db.Model):
 
 class Channel(db.Model):
     __tablename__ = 'channels'
-    channelName = db.Column(db.String, primary_key=True, nullable=False)
+    channelName = db.Column(db.String,primary_key=True, nullable=False)
     creator = db.Column(db.String, nullable=False)
 
     def __init__(self, channelName, creator):
