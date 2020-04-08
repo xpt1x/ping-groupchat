@@ -8,6 +8,20 @@ document.addEventListener('DOMContentLoaded', () => {
         container.scrollTop = (container.scrollHeight + container.offsetHeight);
     }
 
+    function GetUsername() {
+        var user_name = null
+        const request = new XMLHttpRequest()
+        request.open('GET', '/user', false)
+        request.onload = () => {
+            const response = JSON.parse(request.responseText)
+            if(response.status == 200) {
+                user_name = response.name
+            }
+        }
+        request.send()
+        return user_name
+    }
+
     socket.on('connect', () => {
         // let server know user has joined channel
         socket.emit('user joined')
@@ -57,6 +71,34 @@ document.addEventListener('DOMContentLoaded', () => {
     if (document.getElementById("prune-btn")) {
         document.querySelector('#prune-btn').onclick = () => {
             socket.emit('chat prune clicked')
+        }
+    }
+
+    if(document.getElementById("ban-modal-btn")) {
+
+        document.querySelector('#ban-modal-btn').onclick = () => {
+            const request = new XMLHttpRequest()
+            request.open('GET', `/userinfo/${document.getElementById("ban-modal-btn").value}`)
+            request.onload = () => {
+                const response = JSON.parse(request.responseText)
+
+                if(response.status == 200) {
+                    document.getElementById("ban-options").innerHTML = ''
+                    response.users.forEach(name => {
+                        var option = document.createElement('option')
+                        option.value = option.innerHTML = name
+                        document.getElementById("ban-options").appendChild(option)
+                    });
+                }
+                else {
+                    document.getElementById('ban-form').innerHTML = 'Something went wrong'
+                }
+            }
+            request.send()
+        }
+
+        document.querySelector('#ban-btn').onclick = () => {
+            socket.emit('ban clicked', {'user': document.getElementById('ban-options').value})
         }
     }
 
@@ -132,7 +174,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         document.querySelector('#chat-box').append(li)
-
         ScrollToBottom()
     })
 
@@ -146,6 +187,20 @@ document.addEventListener('DOMContentLoaded', () => {
         const li = document.createElement('li')
         li.classList.add('list-group-item')
         li.innerHTML = `Owner <strong>${data.user_name}</strong> has pruned the chat`
+
+        document.querySelector('#chat-box').append(li)
+        ScrollToBottom()
+    })
+
+    socket.on('user banned', data => {
+        if(GetUsername() == data.user) {
+            window.alert('You have been banned from this channel by ' + data.by)
+            window.location.replace('/leave')
+        }
+
+        const li = document.createElement('li')
+        li.classList.add('list-group-item')
+        li.innerHTML = `Owner <strong>${data.by}</strong> has banned user: ${data.user}`
 
         document.querySelector('#chat-box').append(li)
         ScrollToBottom()

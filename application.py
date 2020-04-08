@@ -148,6 +148,9 @@ def SetChannel(qchannel):
 
     if not ichannel:
         return render_template('index.html', channels=Channel.query.all(), errmsg='Channel not found!')
+    #check if user is allowed or not
+    if not IsAllowed(session.get('user_name'), ichannel):
+        return render_template('index.html', channels=Channel.query.all(), errmsg='You can\'t join! You are banned from this channel')
     # fetch old messages ( limit by msg_limit )
     msgs = Message.query.filter_by(channelName=ichannel.channelName).order_by(Message.id).all()
     msgs = msgs[-msg_limit:]
@@ -155,6 +158,17 @@ def SetChannel(qchannel):
     session['last_channel'] = ichannel.channelName
     session['last_channel_creator'] = ichannel.creator
     return render_template('chat.html', channel=ichannel, msgs=msgs)
+
+def IsAllowed(username, ichannel):
+    print(f'Checking for {username} and {ichannel.channelName}')
+    UserList = BannedUser.query.filter_by(channel=ichannel.channelName).all()
+    if not UserList:
+        return True
+
+    for iuser in UserList:
+        if iuser.user == username:
+            return False
+    return True
 
 @socketio.on('user joined')
 def room_joined():
@@ -210,6 +224,15 @@ def PruneChat():
 
     emit('prune announce', {'user_name': session.get('user_name')}, room=room)   
 
+@socketio.on('ban clicked')
+def BanUser(data):
+    # not self
+    if data['user'] != session.get('user_name'):
+        usr = BannedUser(session.get('last_channel'), data['user'])
+        db.session.add(usr)
+        db.session.commit()
+        emit('user banned', {'user': data['user'], 'by': session.get('user_name')}, room=session.get('last_channel'))
+
 @socketio.on('send message')
 def AnnounceMsg(data):
     # add data to DB
@@ -247,6 +270,7 @@ def log_out():
 
 @app.route('/leave')
 def LeaveRoute():
+    Channels[session.get('last_channel')].discard(session.get('user_name'))
     session.pop('last_channel', None)
     session.pop('last_channel_creator', None)
     return redirect(url_for('index'))
@@ -268,12 +292,23 @@ def UserPanel():
 
 # ------------ WIP --------------
 # ------------ WIP --------------
+
 @app.route('/userinfo/<channel>')
 def SendUsersInfo(channel):
+    'API route to request users info'
     if channel in Channels.keys():
-        return jsonify({'status': 200, 'users':list(Channels[channel])})
+        if len(Channels[channel]) == 0:
+            return jsonify({'status': 404})
+        else:
+            return jsonify({'status': 200, 'users':list(Channels[channel])})
     #else return 404
-    #handle empty user list too !
+    else:
+        return jsonify({'status': 404})
+
+@app.route('/user')
+def SendUserName():
+    if session.get('user_name'):
+        return jsonify({'status': 200, 'name': session.get('user_name')})
     else:
         return jsonify({'status': 404})
 
@@ -297,6 +332,7 @@ def AdminLogin():
             return 'WELCOME MR. ADMIN <br>----- WIP -----'
 # ------------ WIP --------------
 # ------------ WIP --------------
+
 
 @app.before_request
 def BeforeRequest():
