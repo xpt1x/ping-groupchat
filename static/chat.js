@@ -99,6 +99,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
             request.send()
+            
         }
 
         document.querySelector('#ban-btn').onclick = () => {
@@ -109,10 +110,16 @@ document.addEventListener('DOMContentLoaded', () => {
     if(document.getElementById("unban-modal-btn")) {
 
         document.querySelector('#unban-modal-btn').onclick = () => {
+            document.getElementById('loading').style.display = 'block'
+            document.getElementById('unban-form').style.display = 'none'
             const request = new XMLHttpRequest()
-            request.open('GET', `/bannedUsers/${document.getElementById("ban-modal-btn").value}`)
+            request.open('GET', `/bannedUsers/${document.getElementById("unban-modal-btn").value}`)
+            
             request.onload = () => {
                 const response = JSON.parse(request.responseText)
+                // for loading 
+                document.getElementById('loading').style.display = 'none'
+                document.getElementById('unban-form').style.display = 'block'
 
                 if(response.status == 200) {
                     document.getElementById('unban-label').innerHTML = 'Ban User'
