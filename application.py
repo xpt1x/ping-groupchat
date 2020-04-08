@@ -160,15 +160,9 @@ def SetChannel(qchannel):
     return render_template('chat.html', channel=ichannel, msgs=msgs)
 
 def IsAllowed(username, ichannel):
-    print(f'Checking for {username} and {ichannel.channelName}')
-    UserList = BannedUser.query.filter_by(channel=ichannel.channelName).all()
-    if not UserList:
+    if not BannedUser.query.filter(and_(BannedUser.user == username, BannedUser.channel == ichannel.channelName)).first():
         return True
-
-    for iuser in UserList:
-        if iuser.user == username:
-            return False
-    return True
+    return False
 
 @socketio.on('user joined')
 def room_joined():
@@ -232,6 +226,12 @@ def BanUser(data):
         db.session.add(usr)
         db.session.commit()
         emit('user banned', {'user': data['user'], 'by': session.get('user_name')}, room=session.get('last_channel'))
+
+@socketio.on('unban clicked')
+def UnBanUser(data):
+    BannedUser.query.filter(and_(BannedUser.user == data['user'], BannedUser.channel == session.get('last_channel'))).delete()
+    db.session.commit()
+    emit('user unbanned', {'user': data['user'], 'by': session.get('user_name')}, room=session.get('last_channel'))
 
 @socketio.on('send message')
 def AnnounceMsg(data):
@@ -304,6 +304,18 @@ def SendUsersInfo(channel):
     #else return 404
     else:
         return jsonify({'status': 404})
+
+@app.route('/bannedUsers/<ichannel>')
+def BannedUsersInfo(ichannel):
+    'API route to request banned users info'
+    UserList = BannedUser.query.filter_by(channel=ichannel).all()
+    if not UserList:
+        return jsonify({'status': 404})
+    
+    li = []
+    for iuser in UserList:
+        li.append(iuser.user)
+    return jsonify({'status': 200, 'users': li})
 
 @app.route('/user')
 def SendUserName():

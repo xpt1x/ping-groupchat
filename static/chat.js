@@ -89,9 +89,12 @@ document.addEventListener('DOMContentLoaded', () => {
                         option.value = option.innerHTML = name
                         document.getElementById("ban-options").appendChild(option)
                     });
+                    document.getElementById('ban-options').disabled = false
+                    document.getElementById('ban-btn').disabled = false
                 }
                 else {
-                    document.getElementById('ban-form').innerHTML = 'Something went wrong'
+                    document.getElementById('ban-options').disabled = true
+                    document.getElementById('ban-btn').disabled = true
                 }
             }
             request.send()
@@ -99,6 +102,37 @@ document.addEventListener('DOMContentLoaded', () => {
 
         document.querySelector('#ban-btn').onclick = () => {
             socket.emit('ban clicked', {'user': document.getElementById('ban-options').value})
+        }
+    }
+
+    if(document.getElementById("unban-modal-btn")) {
+
+        document.querySelector('#unban-modal-btn').onclick = () => {
+            const request = new XMLHttpRequest()
+            request.open('GET', `/bannedUsers/${document.getElementById("ban-modal-btn").value}`)
+            request.onload = () => {
+                const response = JSON.parse(request.responseText)
+
+                if(response.status == 200) {
+                    document.getElementById("unban-options").innerHTML = ''
+                    response.users.forEach(name => {
+                        var option = document.createElement('option')
+                        option.value = option.innerHTML = name
+                        document.getElementById("unban-options").appendChild(option)
+                    });
+                    document.getElementById('unban-options').disabled = false
+                    document.getElementById('unban-btn').disabled = false
+                }
+                else {
+                    document.getElementById('unban-options').disabled = true
+                    document.getElementById('unban-btn').disabled = true
+                }
+            }
+            request.send()
+        }
+
+        document.querySelector('#unban-btn').onclick = () => {
+            socket.emit('unban clicked', {'user': document.getElementById('unban-options').value})
         }
     }
 
@@ -202,6 +236,14 @@ document.addEventListener('DOMContentLoaded', () => {
         li.classList.add('list-group-item')
         li.innerHTML = `Owner <strong>${data.by}</strong> has banned user: ${data.user}`
 
+        document.querySelector('#chat-box').append(li)
+        ScrollToBottom()
+    })
+
+    socket.on('user unbanned', data => {
+        const li = document.createElement('li')
+        li.classList.add('list-group-item')
+        li.innerHTML = `Owner <strong>${data.by}</strong> has unbanned user: ${data.user}`
         document.querySelector('#chat-box').append(li)
         ScrollToBottom()
     })

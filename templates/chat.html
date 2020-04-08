@@ -49,6 +49,7 @@
                 <button class="dropdown-item" type="button" data-toggle="modal" data-target="#destory-modal">Destroy Channel</button>
                 <button class="dropdown-item" type="button" data-toggle="modal" data-target="#prune-modal">Prune Chat</button>
                 <button id="ban-modal-btn" value="{{channel.channelName}}" class="dropdown-item" type="button" data-toggle="modal" data-target="#ban-modal">Ban User</button>
+                <button id="unban-modal-btn" value="{{channel.channelName}}" class="dropdown-item" type="button" data-toggle="modal" data-target="#unban-modal">Unban User</button>            
             </div>
         </div>
         
@@ -71,6 +72,29 @@
                 <div class="modal-footer">
                 <button type="button" class="btn btn-outline-dark" data-dismiss="modal">Close</button>
                 <button id="ban-btn" type="button" data-dismiss="modal" class="btn btn-outline-danger">Ban User</button>
+                </div>
+            </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="unban-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Select a user in <strong>{{channel.channelName}}</strong></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                </div>
+                <div class="modal-body">
+                    <div id="unban-form" class="form-group">
+                        <label for="unban-options">UnBan User</label>
+                        <select class="form-control" id="unban-options"> </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-outline-dark" data-dismiss="modal">Close</button>
+                <button id="unban-btn" type="button" data-dismiss="modal" class="btn btn-outline-success">UnBan User</button>
                 </div>
             </div>
             </div>
