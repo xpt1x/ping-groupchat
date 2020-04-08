@@ -93,6 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     document.getElementById('ban-btn').disabled = false
                 }
                 else {
+                    document.getElementById("ban-options").innerHTML = ''
                     document.getElementById('ban-options').disabled = true
                     document.getElementById('ban-btn').disabled = true
                 }
@@ -114,16 +115,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 const response = JSON.parse(request.responseText)
 
                 if(response.status == 200) {
+                    document.getElementById('unban-label').innerHTML = 'Ban User'
                     document.getElementById("unban-options").innerHTML = ''
                     response.users.forEach(name => {
                         var option = document.createElement('option')
                         option.value = option.innerHTML = name
                         document.getElementById("unban-options").appendChild(option)
                     });
+                    
                     document.getElementById('unban-options').disabled = false
                     document.getElementById('unban-btn').disabled = false
                 }
                 else {
+                    document.getElementById("unban-options").innerHTML = ''
+                    document.getElementById('unban-label').innerHTML = 'No Users to unban'
                     document.getElementById('unban-options').disabled = true
                     document.getElementById('unban-btn').disabled = true
                 }
@@ -183,7 +188,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         
         li.classList.add('list-group-item')
-        li.innerHTML = `<strong>${data.user_name}</strong> has joined the channel`
+        li.innerHTML = `> User <strong>${data.user_name}</strong> has joined the channel`
 
         document.querySelector('#chat-box').append(li)
         ScrollToBottom()
@@ -193,12 +198,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const li = document.createElement('li')
         li.classList.add('list-group-item')
-        li.innerHTML = `<strong>${data.user_name}</strong> has left the channel`
+        li.innerHTML = `> User <strong>${data.user_name}</strong> has left the channel`
         
         var div = document.getElementById('online-users')
         while(div.hasChildNodes()) {
             div.removeChild(div.firstChild)
         }
+
         data.users.forEach(user => {
             const a = document.createElement('a')
             a.id = `user-${user}`
@@ -220,7 +226,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelector('#chat-box').innerHTML = ''
         const li = document.createElement('li')
         li.classList.add('list-group-item')
-        li.innerHTML = `Owner <strong>${data.user_name}</strong> has pruned the chat`
+        li.innerHTML = `> Owner <strong>${data.user_name}</strong> has pruned the chat`
 
         document.querySelector('#chat-box').append(li)
         ScrollToBottom()
@@ -232,9 +238,18 @@ document.addEventListener('DOMContentLoaded', () => {
             window.location.replace('/leave')
         }
 
+        var div = document.getElementById('online-users')
+        for (var i=0; i<div.childNodes.length; i++) {
+            var child = div.childNodes[i];
+            if (child.innerHTML == data.user) {
+                div.removeChild(child)
+                break
+            }
+          }
+
         const li = document.createElement('li')
         li.classList.add('list-group-item')
-        li.innerHTML = `Owner <strong>${data.by}</strong> has banned user: ${data.user}`
+        li.innerHTML = `> Owner <strong>${data.by}</strong> has banned user: ${data.user}`
 
         document.querySelector('#chat-box').append(li)
         ScrollToBottom()
@@ -243,7 +258,7 @@ document.addEventListener('DOMContentLoaded', () => {
     socket.on('user unbanned', data => {
         const li = document.createElement('li')
         li.classList.add('list-group-item')
-        li.innerHTML = `Owner <strong>${data.by}</strong> has unbanned user: ${data.user}`
+        li.innerHTML = `> Owner <strong>${data.by}</strong> has unbanned user: ${data.user}`
         document.querySelector('#chat-box').append(li)
         ScrollToBottom()
     })

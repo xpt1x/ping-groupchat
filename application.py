@@ -150,7 +150,7 @@ def SetChannel(qchannel):
         return render_template('index.html', channels=Channel.query.all(), errmsg='Channel not found!')
     #check if user is allowed or not
     if not IsAllowed(session.get('user_name'), ichannel):
-        return render_template('index.html', channels=Channel.query.all(), errmsg='You can\'t join! You are banned from this channel')
+        return render_template('index.html', channels=Channel.query.all(), errmsg='Sorry! You are banned from this channel')
     # fetch old messages ( limit by msg_limit )
     msgs = Message.query.filter_by(channelName=ichannel.channelName).order_by(Message.id).all()
     msgs = msgs[-msg_limit:]
@@ -158,11 +158,6 @@ def SetChannel(qchannel):
     session['last_channel'] = ichannel.channelName
     session['last_channel_creator'] = ichannel.creator
     return render_template('chat.html', channel=ichannel, msgs=msgs)
-
-def IsAllowed(username, ichannel):
-    if not BannedUser.query.filter(and_(BannedUser.user == username, BannedUser.channel == ichannel.channelName)).first():
-        return True
-    return False
 
 @socketio.on('user joined')
 def room_joined():
@@ -181,7 +176,8 @@ def room_joined():
 def room_left():
     room = session.get('last_channel')
     leave_room(room)
-    Channels[room].remove(session.get('user_name'))
+    Channels[room].discard(session.get('user_name'))
+    li = set()
     session.pop('last_channel', None)
     session.pop('last_channel_creator', None)
     emit('left announce', {
@@ -290,9 +286,7 @@ def UserPanel():
     db.session.commit()
     return render_template('index.html', channels=channels, sucmsg='Password updated Successfully')
 
-# ------------ WIP --------------
-# ------------ WIP --------------
-
+####### API ROUTES to collect useful Info 
 @app.route('/userinfo/<channel>')
 def SendUsersInfo(channel):
     'API route to request users info'
@@ -312,7 +306,7 @@ def BannedUsersInfo(ichannel):
     if not UserList:
         return jsonify({'status': 404})
     
-    li = []
+    li = list()
     for iuser in UserList:
         li.append(iuser.user)
     return jsonify({'status': 200, 'users': li})
@@ -323,28 +317,12 @@ def SendUserName():
         return jsonify({'status': 200, 'name': session.get('user_name')})
     else:
         return jsonify({'status': 404})
+####### END API Routes
 
-@app.route('/admin')
-def AdminLogin():
-    if not session.get('user_name'):
-        return render_template('login.html', errmsg='Please login first, then visit admin route')
-    # make first one to visit this route --> ADMIN 
-    if not User.query.filter_by(admin = True).all():
-        user = User.query.get(session.get('user_name'))
-        user.admin = True
-        db.session.commit()
-        return 'YOU ARE ADDDED AS ADMIN'
-    # there exists an admin
-    else:
-        admin = User.query.filter(and_(User.user_name == session.get('user_name'), User.admin == True)).all()
-        if not admin:
-            return redirect(url_for('index'))
-        else:
-            # show admin dashboard
-            return 'WELCOME MR. ADMIN <br>----- WIP -----'
-# ------------ WIP --------------
-# ------------ WIP --------------
-
+def IsAllowed(username, ichannel):
+    if not BannedUser.query.filter(and_(BannedUser.user == username, BannedUser.channel == ichannel.channelName)).first():
+        return True
+    return False
 
 @app.before_request
 def BeforeRequest():
