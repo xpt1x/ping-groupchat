@@ -271,6 +271,12 @@ def LeaveRoute():
     session.pop('last_channel_creator', None)
     return redirect(url_for('index'))
 
+@app.route('/chnlDstryd')
+def ChannelDestroyed():
+    session.pop('last_channel', None)
+    session.pop('last_channel_creator', None)
+    return redirect(url_for('index'))
+
 @app.route('/user', methods=['POST'])
 def UserPanel():
     channels = Channel.query.all()
@@ -317,7 +323,7 @@ def SendUserName():
         return jsonify({'status': 200, 'name': session.get('user_name')})
     else:
         return jsonify({'status': 404})
-####### END API Routes
+# ####### END API Routes
 
 def IsAllowed(username, ichannel):
     if not BannedUser.query.filter(and_(BannedUser.user == username, BannedUser.channel == ichannel.channelName)).first():

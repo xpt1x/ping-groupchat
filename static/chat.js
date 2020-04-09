@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (document.getElementById("destroy-btn")) {
         document.querySelector('#destroy-btn').onclick = () => {
             socket.emit('channel destroy clicked')
-            window.location.replace('/leave')
+            window.location.replace('/chnlDstryd')
         }
     }
 
@@ -226,7 +226,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     socket.on('destroy announce', data =>{
         window.alert('Channel Destroyed')
-        window.location.replace('/leave')
+        window.location.replace('/chnlDstryd')
     })
 
     socket.on('prune announce', data =>{
