@@ -2,8 +2,8 @@
 Web application which provides real time communication with help of Socket.IO, options like channel creation/join, user registration/login, basic channel features are there. All features of the application are listed on registration page under a button **Display app features**
 
 ## TEST RUN
-To be provided
-
+https://ping-xpt1x.herokuapp.com/
+`Powered by heroku`
 ## Installation
 In order to run this project, you must have python3 installed on your system
 ```bash
