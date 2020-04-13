@@ -181,7 +181,7 @@ document.addEventListener('DOMContentLoaded', () => {
     })
 
     socket.on('on user join', data => {
-        var div = document.getElementById('online-users')
+        var div = document.getElementById('participants')
         while(div.hasChildNodes()) {
             div.removeChild(div.firstChild)
         }
@@ -191,7 +191,7 @@ document.addEventListener('DOMContentLoaded', () => {
             a.id = `user-${user}`
             a.classList.add('dropdown-item')
             a.innerHTML = user
-            document.getElementById('online-users').appendChild(a)
+            document.getElementById('participants').appendChild(a)
         });
         
         li.classList.add('list-group-item')
@@ -207,7 +207,7 @@ document.addEventListener('DOMContentLoaded', () => {
         li.classList.add('list-group-item')
         li.innerHTML = `> User <strong>${data.user_name}</strong> has left the channel`
         
-        var div = document.getElementById('online-users')
+        var div = document.getElementById('participants')
         while(div.hasChildNodes()) {
             div.removeChild(div.firstChild)
         }
@@ -217,7 +217,7 @@ document.addEventListener('DOMContentLoaded', () => {
             a.id = `user-${user}`
             a.classList.add('dropdown-item')
             a.innerHTML = user
-            document.getElementById('online-users').appendChild(a)
+            document.getElementById('participants').appendChild(a)
         });
 
         document.querySelector('#chat-box').append(li)
@@ -245,7 +245,7 @@ document.addEventListener('DOMContentLoaded', () => {
             window.location.replace('/leave')
         }
 
-        var div = document.getElementById('online-users')
+        var div = document.getElementById('participants')
         for (var i=0; i<div.childNodes.length; i++) {
             var child = div.childNodes[i];
             if (child.innerHTML == data.user) {
