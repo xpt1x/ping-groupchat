@@ -8,5 +8,5 @@ werkzeug>=0.15.3
 #Heroku
 psycopg2-binary
 gunicorn==20.0.4
-eventlet==0.25.1
+eventlet==0.31.0
 
